@@ -30,4 +30,4 @@ jobs:
     - name: make run
       run: sh -c 'make run || true &' 2>&1 | tee output
     - name: check expected output
-      run: git grep --quiet --no-index --all-match -e '^hello world' output
+      run: git grep --quiet --no-index --all-match -e '^hello, world' output
