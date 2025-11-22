@@ -20,8 +20,14 @@ jobs:
       run: |
           sudo apt update --yes
           sudo apt install -o Acquire::Retries=3 --yes \
-              build-essential
+              git \
+              build-essential \
+              gcc-riscv64-unknown-elf \
+              picolibc-riscv64-unknown-elf \
+              qemu-system-misc
     - name: make
-      run: make hello
-    - name: run
-      run: ./hello | grep ^hello
+      run: make
+    - name: make run
+      run: sh -c 'make run || true &' 2>&1 | tee output
+    - name: check expected output
+      run: git grep --quiet --no-index --all-match -e '^hello world' output
