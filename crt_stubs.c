@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include "sbi/sbi.h"
 
-[[noreturn]] void
+__attribute__((noreturn))
+void
 _exit(int status)
 {
 	sbi_system_shutdown();
+	while (1) __asm__ __volatile__("wfi");
 }
 
 int

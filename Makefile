@@ -28,9 +28,9 @@ CFLAGS        += -Wwrite-strings
 
 LIBMRUBY      ?= mruby/build/$(MRUBY_CONFIG_NAME)/lib/libmruby.a
 
-hello.elf: hello.c riscv.ld test_program.c $(LIBMRUBY) sbi.o sbi_console.o sbi_helper.o oslib.o
+hello.elf: hello.c riscv.ld test_program.c $(LIBMRUBY) sbi.o sbi_console.o sbi_helper.o crt_stubs.o
 	# $(CC) $(CFLAGS) $(OSLIB) -Imruby/include -Triscv.ld $< -o $@ sbi.o sbi_helper.o sbi_console.o $(LIBMRUBY)
-	$(CC) $(CFLAGS) -Imruby/include -Triscv.ld $< -o $@ sbi.o sbi_helper.o sbi_console.o oslib.o $(LIBMRUBY)
+	$(CC) $(CFLAGS) -Imruby/include -Triscv.ld $< -o $@ sbi.o sbi_helper.o sbi_console.o crt_stubs.o $(LIBMRUBY)
 
 import-mruby:
 	egrep -q "^PROJECT_NUMBER\s*=\s*$(MRUBY_VERSION)\s*$$" mruby/Doxyfile >/dev/null 2>&1 \
@@ -54,7 +54,7 @@ sbi_console.o: sbi_console.c
 	$(CC) $(CFLAGS) -c $<
 sbi_helper.o: sbi_helper.c
 	$(CC) $(CFLAGS) -c $<
-oslib.o: oslib.c
+crt_stubs.o: crt_stubs.c
 	$(CC) $(CFLAGS) -c $<
 
 test_program.c: test_program.rb $(LIBMRUBY)
