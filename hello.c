@@ -2,9 +2,10 @@
 #include <stdlib.h>
 
 #include <mruby.h>
-#include <mruby/irep.h>
+//#include <mruby/irep.h>
+#include <mruby/compile.h>
 #include "sbi/sbi.h"
-#include "test_program.c"
+//#include "test_program.c"
 
 int main(void)
 {
@@ -16,7 +17,7 @@ int main(void)
 		fprintf(stderr, "error: failed to initialize mruby!\n");
 		exit(1);
 	}
-	mrb_load_irep(mrb, test_symbol);
+	mrb_load_string(mrb, "print \"mruby: compiler: hello, world!\n\"");
 	mrb_close(mrb);
 
 	exit(0);
