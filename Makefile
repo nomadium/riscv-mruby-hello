@@ -2,6 +2,10 @@ MRUBY_VERSION     ?= 3.4.0
 MRUBY_REPO        ?= https://github.com/mruby/mruby
 MRUBY_CONFIG_NAME ?= baremetal
 
+OBJS = sbi.o \
+       sbi_console.o \
+       sbi_helper.o
+
 TARGET_TRIPLET  = riscv64-unknown-elf
 CROSS_COMPILE  ?= $(TARGET_TRIPLET)-
 CC              = $(CROSS_COMPILE)gcc
@@ -30,8 +34,8 @@ EXTRA_CFLAGS += -Wwrite-strings
 
 LIBMRUBY      ?= mruby/build/$(MRUBY_CONFIG_NAME)/lib/libmruby.a
 
-hello.elf: hello.c riscv.ld test_program.c $(LIBMRUBY)
-	$(CC) $(CFLAGS) $(OSLIB) $(EXTRA_CFLAGS) -Triscv.ld $< -o $@ $(LIBMRUBY)
+hello.elf: hello.c riscv.ld test_program.c $(LIBMRUBY) $(OBJS)
+	$(CC) $(CFLAGS) $(OSLIB) -Imruby/include -Triscv.ld $< -o $@ $(OBJS) $(LIBMRUBY)
 
 import-mruby:
 	egrep -q "^PROJECT_NUMBER\s*=\s*$(MRUBY_VERSION)\s*$$" mruby/Doxyfile >/dev/null 2>&1 \
@@ -61,7 +65,7 @@ run: hello.elf
 	$(QEMU) $(QEMU_FLAGS) -kernel $<
 
 clean:
-	rm -rf hello.elf test_program.c
+	rm -rf hello.elf test_program.c *.o
 
 clean-mruby:
 	rm -rf mruby/build/* *.rb.lock
