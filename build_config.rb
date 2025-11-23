@@ -21,5 +21,7 @@ MRuby::CrossBuild.new(ENV['MRUBY_CONFIG_NAME'] || 'minimal') do |conf|
   conf.cc.include_paths << ['include']
 
   # Build only the core library. Do NOT build `mruby` binary.
-  conf.bins = []
+  # conf.bins = []
+
+  conf.gem :core => 'mruby-compiler'
 end
