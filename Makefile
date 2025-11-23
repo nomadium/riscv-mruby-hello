@@ -28,8 +28,8 @@ CFLAGS        += -Wwrite-strings
 
 LIBMRUBY      ?= mruby/build/$(MRUBY_CONFIG_NAME)/lib/libmruby.a
 
-hello.elf: hello.c riscv.ld test_program.c $(LIBMRUBY)
-	$(CC) $(CFLAGS) $(OSLIB) -Imruby/include -Triscv.ld $< -o $@ $(LIBMRUBY)
+hello.elf: hello.c riscv.ld test_program.c $(LIBMRUBY) sbi.o sbi_console.o sbi_helper.o
+	$(CC) $(CFLAGS) $(OSLIB) -Imruby/include -Triscv.ld $< -o $@ sbi.o sbi_helper.o sbi_console.o $(LIBMRUBY)
 
 import-mruby:
 	egrep -q "^PROJECT_NUMBER\s*=\s*$(MRUBY_VERSION)\s*$$" mruby/Doxyfile >/dev/null 2>&1 \
@@ -47,6 +47,13 @@ mruby: import-mruby
 				rake)
 $(LIBMRUBY): mruby
 
+sbi.o: sbi.c
+	$(CC) $(CFLAGS) -c $<
+sbi_console.o: sbi_console.c
+	$(CC) $(CFLAGS) -c $<
+sbi_helper.o: sbi_helper.c
+	$(CC) $(CFLAGS) -c $<
+
 test_program.c: test_program.rb $(LIBMRUBY)
 	mruby/bin/mrbc -Btest_symbol test_program.rb
 
@@ -59,7 +66,7 @@ run: hello.elf
 	$(QEMU) $(QEMU_FLAGS) -kernel $<
 
 clean:
-	rm -rf hello.elf test_program.c
+	rm -rf hello.elf test_program.c *.o
 
 clean-mruby:
 	rm -rf mruby/build/* *.rb.lock
