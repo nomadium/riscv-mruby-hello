@@ -52,10 +52,11 @@ $(LIBMRUBY): mruby
 test_program.c: test_program.rb $(LIBMRUBY)
 	mruby/bin/mrbc -Btest_symbol test_program.rb
 
+OPENSBI ?= /usr/lib/riscv64-linux-gnu/opensbi/generic/fw_jump.bin
 QEMU ?= qemu-system-riscv64
 QEMU_SEMIHOST ?= -semihosting-config enable=on
-QEMU_HW_FLAGS ?= -serial none -nographic -machine virt,accel=tcg -cpu rv64
-QEMU_FLAGS    ?= -monitor none -bios none $(QEMU_SEMIHOST) $(QEMU_HW_FLAGS)
+QEMU_HW_FLAGS ?= -nographic -machine virt,accel=tcg -cpu rv64 -display none
+QEMU_FLAGS    ?= -bios $(OPENSBI) $(QEMU_SEMIHOST) $(QEMU_HW_FLAGS)
 run: hello.elf
 	$(QEMU) $(QEMU_FLAGS) -kernel $<
 
