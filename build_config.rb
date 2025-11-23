@@ -1,3 +1,10 @@
+MRuby::Build.new('host') do |conf|
+  conf.toolchain :gcc
+
+  conf.gem :core => "mruby-bin-mirb"
+  conf.gem :core => "mruby-bin-mruby"
+end
+
 MRuby::CrossBuild.new(ENV['MRUBY_CONFIG_NAME'] || 'minimal') do |conf|
   conf.toolchain :gcc
 
