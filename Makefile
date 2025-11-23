@@ -4,13 +4,13 @@ MRUBY_CONFIG_NAME ?= baremetal
 
 OBJS = sbi.o \
        sbi_console.o \
-       sbi_helper.o
+       sbi_helper.o \
+       crt_stubs.o
 
 TARGET_TRIPLET  = riscv64-unknown-elf
 CROSS_COMPILE  ?= $(TARGET_TRIPLET)-
 CC              = $(CROSS_COMPILE)gcc
 PICOLIBC_SPECS ?= --specs=/usr/lib/picolibc/$(TARGET_TRIPLET)/picolibc.specs
-OSLIB          ?= --oslib=semihost
 
 # No linker flags, not stdlib, no crt*.o
 CROSS_LDFLAGS ?= -nostdlib -nostartfiles
@@ -35,7 +35,7 @@ EXTRA_CFLAGS += -Wwrite-strings
 LIBMRUBY      ?= mruby/build/$(MRUBY_CONFIG_NAME)/lib/libmruby.a
 
 hello.elf: hello.c riscv.ld test_program.c $(LIBMRUBY) $(OBJS)
-	$(CC) $(CFLAGS) $(OSLIB) -Imruby/include -Triscv.ld $< -o $@ $(OBJS) $(LIBMRUBY)
+	$(CC) $(CFLAGS) -Imruby/include -Triscv.ld $< -o $@ $(OBJS) $(LIBMRUBY)
 
 import-mruby:
 	egrep -q "^PROJECT_NUMBER\s*=\s*$(MRUBY_VERSION)\s*$$" mruby/Doxyfile >/dev/null 2>&1 \
@@ -58,9 +58,8 @@ test_program.c: test_program.rb $(LIBMRUBY)
 
 OPENSBI ?= /usr/lib/riscv64-linux-gnu/opensbi/generic/fw_jump.bin
 QEMU ?= qemu-system-riscv64
-QEMU_SEMIHOST ?= -semihosting-config enable=on
 QEMU_HW_FLAGS ?= -nographic -machine virt,accel=tcg -cpu rv64 -display none
-QEMU_FLAGS    ?= -bios $(OPENSBI) $(QEMU_SEMIHOST) $(QEMU_HW_FLAGS)
+QEMU_FLAGS    ?= -bios $(OPENSBI) $(QEMU_HW_FLAGS)
 run: hello.elf
 	$(QEMU) $(QEMU_FLAGS) -kernel $<
 
