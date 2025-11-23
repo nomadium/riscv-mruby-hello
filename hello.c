@@ -13,7 +13,7 @@ int main(void)
 
 	mrb_state *mrb = mrb_open();
 	if (!mrb) {
-		printf("error: failed to initialize mruby!\n");
+		fprintf(stderr, "error: failed to initialize mruby!\n");
 		exit(1);
 	}
 	mrb_load_irep(mrb, test_symbol);
