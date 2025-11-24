@@ -22,14 +22,16 @@ CFLAGS        += -mabi=lp64
 CFLAGS        += -mcmodel=medany
 # Use picolibc to resolv mruby dependency on libc in freestanding environment
 CFLAGS        += $(PICOLIBC_SPECS)
-# Also add same warning flags and debug options as mruby
-CFLAGS        += -g -Wall -Wundef -Werror-implicit-function-declaration
-CFLAGS        += -Wwrite-strings
+
+# Also add mruby include path and same warning and debug flags used in its build
+EXTRA_CFLAGS  = -Imruby/include
+EXTRA_CFLAGS += -g -Wall -Wundef -Werror-implicit-function-declaration
+EXTRA_CFLAGS += -Wwrite-strings
 
 LIBMRUBY      ?= mruby/build/$(MRUBY_CONFIG_NAME)/lib/libmruby.a
 
 hello.elf: hello.c riscv.ld test_program.c $(LIBMRUBY)
-	$(CC) $(CFLAGS) $(OSLIB) -Imruby/include -Triscv.ld $< -o $@ $(LIBMRUBY)
+	$(CC) $(CFLAGS) $(OSLIB) $(EXTRA_CFLAGS) -Triscv.ld $< -o $@ $(LIBMRUBY)
 
 import-mruby:
 	egrep -q "^PROJECT_NUMBER\s*=\s*$(MRUBY_VERSION)\s*$$" mruby/Doxyfile >/dev/null 2>&1 \
