@@ -25,6 +25,7 @@ jobs:
               gcc-riscv64-unknown-elf \
               picolibc-riscv64-unknown-elf \
               rake \
+              opensbi \
               qemu-system-misc
     - name: make
       run: make
